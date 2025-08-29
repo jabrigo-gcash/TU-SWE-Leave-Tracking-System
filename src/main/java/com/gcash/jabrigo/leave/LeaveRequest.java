@@ -107,7 +107,7 @@ public abstract class LeaveRequest implements Approvable {
     public void printStatusHistory() {
         System.out.println("---- Status History for Request #" + requestId + "----");
         for (StatusChange statusChange : statusHistory) {
-            System.out.println("Status set to " + statusChange.getNewStatus() + " by " + statusChange.getChangedBy()
+            System.out.println("Status set to '" + statusChange.getNewStatus() + "' by " + statusChange.getChangedBy()
                     + " on " + statusChange.getChangeDate());
         }
         System.out.println("---------------------------------");
@@ -140,8 +140,19 @@ public abstract class LeaveRequest implements Approvable {
     }
 
     public enum LeaveRequestStatus {
-        PENDING,
-        APPROVED,
-        DENIED
+        PENDING ("Pending"),
+        APPROVED ("Approved"),
+        DENIED ("Denied");
+
+        private final String displayName;
+
+        LeaveRequestStatus(String displayName) {
+            this.displayName = displayName;
+        }
+
+        @Override
+        public String toString() {
+            return displayName;
+        }
     }
 }
