@@ -24,7 +24,7 @@ public abstract class LeaveRequest implements Approvable {
         this.leaveType = leaveType;
         this.status = LeaveRequestStatus.PENDING;
         statusHistory = new ArrayList<>();
-        statusHistory.add(new StatusChange(LeaveRequestStatus.PENDING,"SYSTEM"));
+        statusHistory.add(new StatusChange(LeaveRequestStatus.PENDING, "System"));
     }
 
     public abstract int calculateLeaveDays();
@@ -33,48 +33,24 @@ public abstract class LeaveRequest implements Approvable {
         return requestId;
     }
 
-    public void setRequestId(int requestId) {
-        this.requestId = requestId;
-    }
-
     public Employee getEmployee() {
         return employee;
-    }
-
-    public void setEmployee(Employee employee) {
-        this.employee = employee;
     }
 
     public String getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(String startDate) {
-        this.startDate = startDate;
-    }
-
     public String getEndDate() {
         return endDate;
-    }
-
-    public void setEndDate(String endDate) {
-        this.endDate = endDate;
     }
 
     public LeaveRequestStatus getStatus() {
         return status;
     }
 
-    public void setStatus(LeaveRequestStatus status) {
-        this.status = status;
-    }
-
     public String getLeaveType() {
         return leaveType;
-    }
-
-    public void setLeaveType(String leaveType) {
-        this.leaveType = leaveType;
     }
 
     public ArrayList<StatusChange> getStatusHistory() {
@@ -94,7 +70,7 @@ public abstract class LeaveRequest implements Approvable {
             }
             case PENDING -> {
                 this.status = LeaveRequestStatus.APPROVED;
-                System.out.println("Request has been approved");
+                System.out.println("Request #" + requestId + " approved by " + approverName + ".");
                 statusHistory.add(new StatusChange(LeaveRequestStatus.APPROVED, approverName));
                 return true;
             }
@@ -115,7 +91,7 @@ public abstract class LeaveRequest implements Approvable {
             }
             case PENDING -> {
                 this.status = LeaveRequestStatus.DENIED;
-                System.out.println("Request has been denied for reason: " + reason);
+                System.out.println("Request #" + requestId + " denied by " + approverName + ". Reason: " + reason);
                 statusHistory.add(new StatusChange(LeaveRequestStatus.DENIED, approverName));
                 return true;
             }
@@ -129,14 +105,16 @@ public abstract class LeaveRequest implements Approvable {
     }
 
     public void printStatusHistory() {
-        statusHistory.forEach( statusChange -> {
-            System.out.println("status: " + statusChange.getNewStatus() + " date: " + statusChange.getChangeDate()
-                    + " changed by: " + statusChange.getChangedBy());
-        });
+        System.out.println("---- Status History for Request #" + requestId + "----");
+        for (StatusChange statusChange : statusHistory) {
+            System.out.println("Status set to " + statusChange.getNewStatus() + " by " + statusChange.getChangedBy()
+                    + " on " + statusChange.getChangeDate());
+        }
+        System.out.println("---------------------------------");
     }
 
 
-    public class StatusChange {
+    public static class StatusChange {
         private final LeaveRequestStatus newStatus;
         private final String changeDate;
         private final String changedBy;

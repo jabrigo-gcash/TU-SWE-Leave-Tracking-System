@@ -26,7 +26,7 @@ public class VacationLeaveRequest extends LeaveRequest{
 
     @Override
     public boolean processLeaveRequest() {
-        System.out.println("Vacation Leave Request processed.");
+        System.out.println("Processing vacation leave request for " + employee.getName() + "...");
         return true;
     }
 }

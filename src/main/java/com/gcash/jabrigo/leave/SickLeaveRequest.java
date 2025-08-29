@@ -26,11 +26,12 @@ public class SickLeaveRequest extends LeaveRequest{
 
     @Override
     public boolean processLeaveRequest() {
+        System.out.println("Processing sick leave request for " + employee.getName() + "...");
         if (calculateLeaveDays() > 2 && !medicalCertificateProvided) {
-            System.out.println("Medical Certificate has not been provided.");
+            System.out.println("-> VALIDATION FAILED: Sick leave longer than 2 days requires a medical certificate.");
             return false;
         } else {
-            System.out.println("Medical leave request processed.");
+            System.out.println("-> VALIDATION SUCCESSFUL: Sick leave is valid.");
             return true;
         }
     }

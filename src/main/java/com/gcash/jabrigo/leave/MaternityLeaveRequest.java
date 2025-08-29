@@ -26,7 +26,7 @@ public class MaternityLeaveRequest extends LeaveRequest{
 
     @Override
     public boolean processLeaveRequest() {
-        System.out.println("Maternity Leave Request processed.");
+        System.out.println("Processing maternity leave request for " + employee.getName() + "...");
         return true;
     }
 }

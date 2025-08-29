@@ -5,9 +5,7 @@ import com.gcash.jabrigo.leave.MaternityLeaveRequest;
 import com.gcash.jabrigo.leave.SickLeaveRequest;
 import com.gcash.jabrigo.leave.VacationLeaveRequest;
 
-import java.util.ArrayList;
-import java.util.InputMismatchException;
-import java.util.Scanner;
+import java.util.*;
 
 public class LeaveTracker {
 
@@ -37,47 +35,14 @@ public class LeaveTracker {
         System.out.println("Enter leave type number: ");
     }
 
-//    public LeaveRequest createLeaveRequest(Employee employee){
-//        LeaveRequest leaveRequest;
-//
-//        if(leaveOption < 0 || leaveOption > 3) {
-//            System.out.println("Invalid leave type.");
-//            return null;
-//        }
-//
-//        System.out.print("Enter Start Date (YYYY-MM-DD): ");
-//        String startDate = s.next();
-//        System.out.print("Enter End Date (YYYY-MM-DD): ");
-//        String endDate = s.next();
-//
-//        switch (leaveOption) {
-//            case 1 -> {
-//                System.out.print("Is a medical certificate provided? (true/false): ");
-//                boolean medCertFlag = Boolean.parseBoolean(s.next());
-//                leaveRequest = new SickLeaveRequest(allLeaveRequests.size()+1, employee, startDate, endDate, medCertFlag);
-//            }
-//            case 2 -> {
-//                System.out.print("Is it paid time off? (true/false): ");
-//                boolean paidTimeOffFlag = Boolean.parseBoolean(s.next());
-//                leaveRequest = new VacationLeaveRequest(allLeaveRequests.size()+1, employee, startDate, endDate, paidTimeOffFlag);
-//            }
-//            case 3 -> {
-//                System.out.print("Enter Expected Delivery Date (YYYY-MM-DD): ");
-//                String deliveryDate = s.next();
-//                leaveRequest = new MaternityLeaveRequest(allLeaveRequests.size()+1, employee, startDate, endDate, deliveryDate);
-//            }
-//            default -> {
-//                leaveRequest = null;
-//            }
-//        }
-//
-//        if (leaveRequest != null) {
-//            allLeaveRequests.add(leaveRequest);
-//            pendingLeaveRequests.add(leaveRequest);
-//        }
-//
-//        return leaveRequest;
-//    }
+    private static void printProcessNextPendingRequest(LeaveRequest pendingRequest) {
+        System.out.println("\n--- Processing Next Pending Request ---");
+        System.out.println("Request ID: " + pendingRequest.getRequestId());
+        System.out.println("Employee: " + pendingRequest.getEmployee().getName());
+        System.out.println("Leave Type: " + pendingRequest.getLeaveType());
+        System.out.println("Dates: " + pendingRequest.getStartDate() + " to " + pendingRequest.getEndDate());
+        System.out.println("Status: " + pendingRequest.getStatus());
+    }
 
     public static void main(String[] args) {
         Scanner s = new Scanner(System.in);
@@ -92,9 +57,8 @@ public class LeaveTracker {
 
         while(!canExit) {
             printMainMenu();
-            int option = 0;
             try {
-                option = s.nextInt();
+                int option = s.nextInt();
                 switch (option) {
                     case 1 -> {
                         printNewLeaveRequestMenu();
@@ -134,19 +98,33 @@ public class LeaveTracker {
                                 String deliveryDate = s.next();
                                 leaveRequest = new MaternityLeaveRequest(allLeaveRequests.size()+1, requestingEmployee, startDate, endDate, deliveryDate);
                             }
-                            default -> {
-                                leaveRequest = null;
-                            }
+                            default -> leaveRequest = null;
                         }
                         if (leaveRequest != null) {
                             allLeaveRequests.add(leaveRequest);
                             System.out.println("\nSuccessfully created Sick Leave request for " + requestingEmployee.getName() + ".");
                         }
                     }
-                    case 2 -> System.out.println("Still WIP");
-                    case 3 -> System.out.println("WIP");
+                    case 2 -> {
+                        LeaveRequest pendingRequest = allLeaveRequests.stream()
+                                .filter(leaveRequest -> leaveRequest.getStatus() == LeaveRequest.LeaveRequestStatus.PENDING)
+                                .sorted(Comparator.comparing(LeaveRequest::getRequestId))
+                                .toList().getFirst();
+
+                        printProcessNextPendingRequest(pendingRequest);
+                        boolean success = pendingRequest.processLeaveRequest();
+                        if (success) {
+                            pendingRequest.approve("System");
+                        } else {
+                            pendingRequest.deny("System", "System validation failed.");
+                        }
+
+                        pendingRequest.printStatusHistory();
+                    }
+                    case 3 -> allLeaveRequests.forEach(LeaveRequest::printStatusHistory);
                     case 4 -> {
                         canExit = true;
+                        System.out.println("\nExiting system. Goodbye!");
                     }
                 }
             } catch (InvalidInputException e) {
@@ -155,7 +133,6 @@ public class LeaveTracker {
                 System.out.println("Invalid input");
             }
         }
-
-        System.out.println("\nExiting system. Goodbye!");
+        s.close();
     }
 }
